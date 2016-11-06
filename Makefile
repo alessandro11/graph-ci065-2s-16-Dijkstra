@@ -4,19 +4,21 @@ TEAM = ae11
 CC = gcc
 INCLUDE = .
 CFLAGS = -O3 -Wall
+DEFINES =
 
 ifdef DEBUG
+	DEFINES = -DDEBUG
 	CFLAGS = -g -Wall
 endif
 
 .SUFFIXES:		.c
 .c.o:
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c $<
+	$(CC) $(DEFINES) $(CFLAGS) -I$(INCLUDE) -c $<
 
 all: teste
 
 teste: teste.o grafo.o
-	$(CC) -o $(@) $^
+	$(CC) -o $(@) $^ -l cgraph
 
 grafo.o: grafo.c grafo.h
 
