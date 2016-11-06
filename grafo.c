@@ -2,16 +2,18 @@
  * =====================================================================================
  *
  *       Filename:  grafo.c
-
  *
- *    Description:  Trabalho1 de grafos Professor Renato.
+ *    Description:  Trabalho2; Professor Renato.
+ *    				O objetivo deste trabalho é implementar rotinas que computam
+ *    				caminhos mínimos e distâncias entre vértices de um grafo,
+ *    				usando o Algoritmo de Dijkstra.
  *
  *        Version:  1.0
- *        Created:  08/27/2016 07:15:24 PM
+ *        Created:  11/06/2016 09:15:24 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Alessandro Elias, GRR20110589, ae11@inf.ufpr.br
+ *         Author:  Alessandro Elias, GRR20110589, ae11@c3sl.ufpr.br
  *
  * =====================================================================================
  */
@@ -253,6 +255,24 @@ long int diametro(grafo g);
 #include <string.h>
 #include <stdlib.h>
 
+#define UNUSED(x)				(void)(x)
+
+#ifdef DEBUG
+
+#define UNUSED(x)				(void)(x)
+
+void print_a(vertice, lista);
+void print_v(grafo g);
+
+#else
+
+#define print_a(vertice, lista)		(void)0
+#define print_v(grafo)				(void)0
+
+#endif /* DEBUG */
+
+
+
 typedef unsigned int uint;
 typedef long int lint;
 typedef unsigned short ushort;
@@ -268,10 +288,6 @@ typedef int bool;
 
 #ifndef NULL
 #define NULL			0
-#endif
-
-#ifdef DEBUG
-#include "debug.h"
 #endif
 
 #define ERRO(fmt, ...)      	(fprintf(stderr, (fmt), ## __VA_ARGS__))
@@ -560,41 +576,6 @@ aresta 	dup_aresta(aresta);
 char* 	str_dup(const char*);
 vertice busca_vertice(const char*, lista);
 
-void print_a(vertice, lista);
-void print_v(grafo g);
-void print_v(grafo g) {
-        no n;
-        struct vertice* v;
-        lista l = g->vertices;
-
-        printf("Grafo %s=%p\n", g->nome, g);
-        for( n=primeiro_no(l); n; n=proximo_no(n) ) {
-                v = conteudo(n);
-                printf("%s=%p\n", v->nome, v);
-                printf("\tV.:\n");
-                print_a(v, v->vizinhos_esq);
-        }
-        fflush(stdout);
-}
-
-void print_a(vertice v, lista l) {
-    no n;
-    struct aresta* a;
-
-    n=primeiro_no(l);
-    if( n ) {
-        a = conteudo(n);
-        printf("\taresta=%p\n", a);
-        printf( "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
-        for( n=proximo_no(n); n; n=proximo_no(n) ) {
-            a = conteudo(n);
-            printf("\taresta=%p\n", a);
-            printf( "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
-        }
-    }
-    fflush(stdout);
-}
-
 grafo alloc_grafo(void) {
 	grafo g = (grafo)calloc(1, sizeof(struct grafo));
 	return g;
@@ -703,9 +684,6 @@ void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 	for( age=agfstedge(ag, agn); age; age=agnxtedge(ag, age, agn) ) {
 		tail = agtail(age);
 		head = aghead(age);
-		fprintf(stderr, "v=%s\n", agnameof(agn));
-		fprintf(stderr, "t=%s\n", agnameof(tail));
-		fprintf(stderr, "h=%s\n\n", agnameof(head));
 
 		if( (Agnode_t*)head == agn )
 			cabeca = busca_vertice(agnameof(tail), g->vertices);
@@ -741,6 +719,7 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 		else
 			guarda_arestas( ag, agn, g, busca_vertice(agnameof(agn), g->vertices) );
 
+		// funciona somente em modo de DEBUG, link com debug.c
 		print_v(g);
 	}
 }
