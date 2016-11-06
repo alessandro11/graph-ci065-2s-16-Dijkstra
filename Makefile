@@ -24,7 +24,7 @@ clean:
 	-rm -rf *.o teste
 
 clean-all:
-	-rm -rf *.o teste *.tar.gz $(TEAM)
+	-rm -rf *.o teste *.tar.gz $(TEAM) Debug Release
 
 tar:
 	-mkdir --parents $(TEAM) && \
