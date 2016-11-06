@@ -6,7 +6,7 @@
 
 int main(void) {
 
-  FILE fs = fopen(PATH_FILE_NAME, "r");
+  FILE *fs = fopen(PATH_FILE_NAME, "r");
   grafo g = le_grafo(fs);
   fclose(fs);
 
