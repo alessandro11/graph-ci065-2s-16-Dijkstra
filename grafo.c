@@ -317,7 +317,7 @@ struct aresta {
 typedef struct aresta* aresta;
 
 int 	destroi_vertice(void*);
-
+int 	destroi_aresta(void*);
 
 //------------------------------------------------------------------------------
 // devolve o nome do grafo g
@@ -415,10 +415,15 @@ int destroi_vertice(void *v) {
 	int ret = 1;
 
 	free( ((vertice)v)->nome );
-	ret = destroi_lista( ((vertice)v)->vizinhos_esq, NULL );
+	ret = destroi_lista( ((vertice)v)->vizinhos_esq, destroi_aresta );
 	free(v);
 
 	return ret;
+}
+
+int destroi_aresta(void *a) {
+    free(a);
+    return 1;
 }
 
 //______________________________________________________________________________
