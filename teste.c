@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include "grafo.h"
 
-#define PATH_FILE_NAME		"../graph-examples/2vg1.dot"
 //------------------------------------------------------------------------------
+int main(int argc, char* argv[]) {
 
-int main(void) {
-
-  FILE *fs = fopen(PATH_FILE_NAME, "r");
+  FILE *fs = fopen(argv[1], "r");
   grafo g = le_grafo(fs);
   fclose(fs);
 
