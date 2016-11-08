@@ -1,0 +1,5 @@
+strict graph "a2" {
+	a -- b
+	b -- c
+	c -- a
+}
