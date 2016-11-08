@@ -51,8 +51,8 @@ typedef struct vertice* vertice;
 
 struct aresta {
 	int		ponderado;
-	int		padding;
 	lint	peso;
+	vertice origem;
 	vertice	destino;
 };
 typedef struct aresta* aresta;
@@ -110,13 +110,13 @@ void print_attr(vertice v, lista l) {
     if( n ) {
         a = conteudo(n);
         fprintf(stderr, "\t(%s, %s) Peso=%ld\n",\
-        		v->nome,\
+				a->origem->nome,\
 				a->destino->nome,\
 				a->peso);
         for( n=proximo_no(n); n; n=proximo_no(n) ) {
             a = conteudo(n);
             fprintf(stderr, "\t(%s, %s) Peso=%ld\n",\
-            		v->nome,\
+					a->origem->nome,\
     				a->destino->nome,\
     				a->peso);
         }
