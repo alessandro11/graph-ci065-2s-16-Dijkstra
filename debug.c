@@ -15,6 +15,18 @@
 typedef unsigned int uint;
 typedef long int lint;
 typedef struct no *no;
+
+typedef enum __Estado {
+	NaoVisitado = 0,
+	Visitado
+}Estado;
+
+struct lista {
+
+  unsigned int tamanho;
+  int padding; // só pra evitar warning
+  no primeiro;
+};
 typedef struct lista *lista;
 
 struct grafo {
@@ -30,6 +42,9 @@ typedef struct grafo *grafo;
 struct vertice {
 	char*	nome;
 	lista	vizinhos_esq;
+	lint	id;
+	lint	distancia;
+	Estado	estado;
 	lista	vizinhos_dir;
 };
 typedef struct vertice* vertice;
@@ -56,18 +71,18 @@ void print_v(grafo g);
 
 /*____________________________________________________________________________*/
 void print_v(grafo g) {
-        no n;
-        struct vertice* v;
-        lista l = g->vertices;
+	no n;
+	struct vertice* v;
+	lista l = g->vertices;
 
-        printf("Grafo %s=%p\n", g->nome, g);
-        for( n=primeiro_no(l); n; n=proximo_no(n) ) {
-                v = conteudo(n);
-                printf("%s=%p\n", v->nome, v);
-                printf("\tV.:\n");
-                print_a(v, v->vizinhos_esq);
-        }
-        fflush(stdout);
+	printf("Grafo %s=%p\n", g->nome, g);
+	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
+			v = conteudo(n);
+			printf("%s=%p\n", v->nome, v);
+			printf("\tV.:\n");
+			print_a(v, v->vizinhos_esq);
+	}
+	fflush(stdout);
 }
 
 void print_a(vertice v, lista l) {
@@ -77,13 +92,52 @@ void print_a(vertice v, lista l) {
     n=primeiro_no(l);
     if( n ) {
         a = conteudo(n);
-        printf("\taresta=%p\n", a);
-        printf( "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
+        fprintf(stderr, "\taresta=%p\n", a);
+        fprintf(stderr, "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
         for( n=proximo_no(n); n; n=proximo_no(n) ) {
             a = conteudo(n);
-            printf("\taresta=%p\n", a);
-            printf( "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
+            fprintf(stderr, "\taresta=%p\n", a);
+            fprintf(stderr, "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
         }
     }
-    fflush(stdout);
+}
+
+void print_attr(vertice v, lista l) {
+	no n;
+	aresta a;
+
+    n=primeiro_no(l);
+    if( n ) {
+        a = conteudo(n);
+        fprintf(stderr, "\t(%s, %s) Peso=%ld\n",\
+        		v->nome,\
+				a->destino->nome,\
+				a->peso);
+        for( n=proximo_no(n); n; n=proximo_no(n) ) {
+            a = conteudo(n);
+            fprintf(stderr, "\t(%s, %s) Peso=%ld\n",\
+            		v->nome,\
+    				a->destino->nome,\
+    				a->peso);
+        }
+    }
+
+}
+
+void print_vattr(grafo g) {
+	no n;
+	vertice v;
+	lista l = g->vertices;
+
+	printf("Grafo %s=%p\n", g->nome, g);
+	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
+		v = conteudo(n);
+        fprintf(stderr, "%s, Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        		v->nome,\
+				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
+				v->distancia,\
+				v->vizinhos_esq->tamanho);
+
+		print_attr(v, v->vizinhos_esq);
+	}
 }
