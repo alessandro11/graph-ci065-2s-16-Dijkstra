@@ -263,11 +263,13 @@ long int diametro(grafo g);
 
 void print_a(vertice, lista);
 void print_v(grafo g);
+void print_vattr(grafo g);
 
 #else
 
 #define print_a(vertice, lista)		(void)0
 #define print_v(grafo)				(void)0
+#define print_vattr(grafo)			(void)0
 
 #endif /* DEBUG */
 
@@ -318,8 +320,8 @@ typedef struct vertice* vertice;
 
 struct aresta {
 	int		ponderado;
-	int		padding;
 	lint	peso;
+	vertice origem;
 	vertice	destino;
 };
 typedef struct aresta* aresta;
@@ -666,6 +668,12 @@ grafo le_grafo(FILE *input) {
     constroi_grafo(Ag_g, g);
 
     agclose(Ag_g);
+
+    vertice u, v;
+    u = busca_vertice("a", g->vertices);
+    v = busca_vertice("e", g->vertices);
+    caminho_minimo(u, v, g);
+
     return g;
 }
 
@@ -744,11 +752,31 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 // a lista é vazia se u e v estão em componentes diferentes de g
 
 lista caminho_minimo(vertice u, vertice v, grafo g) {
+	no n;
+	aresta a;
+	vertice vcurr;
+	lint dist;
+
 	lista T = constroi_lista();
 	insere_lista(u, T);
 
+	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
+		vcurr = conteudo(n);
+		vcurr->estado = NaoVisitado;
+		vcurr->distancia = infinito;
+	}
 	u->estado = Visitado;
-	u->distancia = infinito;
+	u->distancia = 0;
+
+	print_vattr(g);
+
+	vcurr = conteudo(primeiro_no(T));
+	while( vcurr ) {
+		for( n=primeiro_no(vcurr->vizinhos_esq); n; n=proximo_no(n) ) {
+			a = conteudo(n);
+			dist = a->destino->distancia;
+		}
+	}
 
 	return T;
 }
