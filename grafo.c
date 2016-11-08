@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 // o valor representando "infinito"
 
-const long int infinito;
+const long int infinito = ~0;
 
 //-----------------------------------------------------------------------------
 // (apontador para) lista encadeada
@@ -292,6 +292,11 @@ typedef int bool;
 
 #define ERRO(fmt, ...)      	(fprintf(stderr, (fmt), ## __VA_ARGS__))
 
+typedef enum __Estado {
+	NaoVisitado = 0,
+	Visitado
+}Estado;
+
 struct grafo {
 	uint 	nvertices;
 	uint 	narestas;
@@ -304,6 +309,9 @@ struct grafo {
 struct vertice {
 	char*	nome;
 	lista	vizinhos_esq;
+	lint	id;
+	lint	distancia;
+	Estado	estado;
 	lista	vizinhos_dir;
 };
 typedef struct vertice* vertice;
@@ -386,7 +394,7 @@ grafo escreve_grafo(FILE *output, grafo g) {
             a = (aresta)conteudo(na);
             fprintf(output, "    \"%s\" -%c \"%s\"", v->nome, ch, a->destino->nome);
 
-            if ( g->ponderado )
+            if ( a->ponderado )
                 fprintf( output, " [peso=%ld]", a->peso );
             fprintf( output, "\n" );
         }
@@ -727,4 +735,20 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 		// funciona somente em modo de DEBUG, link com debug.c
 		print_v(g);
 	}
+}
+
+//------------------------------------------------------------------------------
+// devolve uma lista de vértices de g representando o caminho mínimo
+// de u a v em g
+//
+// a lista é vazia se u e v estão em componentes diferentes de g
+
+lista caminho_minimo(vertice u, vertice v, grafo g) {
+	lista T = constroi_lista();
+	insere_lista(u, T);
+
+	u->estado = Visitado;
+	u->distancia = infinito;
+
+	return T;
 }
