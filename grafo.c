@@ -20,11 +20,12 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <limits.h>
 
 //------------------------------------------------------------------------------
 // o valor representando "infinito"
 
-const long int infinito = ~0;
+const long int infinito = LONG_MAX;
 
 //-----------------------------------------------------------------------------
 // (apontador para) lista encadeada
@@ -690,6 +691,25 @@ vertice busca_vertice(const char* nome, lista l) {
 	return NULL;
 }
 
+typedef struct __vertices {
+	vertice origem, destino;
+}vertices;
+vertices busca_vertices(const char* nome_orig, const char* nome_dest, lista l) {
+	no n;
+	vertice v;
+	vertices vs = {NULL};
+
+	for( n=primeiro_no(l); n && (vs.origem == NULL || vs.destino == NULL); n=proximo_no(n) ) {
+		v = (vertice)conteudo(n);
+		if( strcmp(nome_orig, v->nome) == 0 )
+			vs.origem = v;
+		else if( strcmp(nome_dest, v->nome) == 0 )
+			vs.destino = v;
+	}
+
+	return vs;
+}
+
 void guarda_arcos(Agraph_t* ag, Agnode_t* av, grafo g) {
 	UNUSED(ag); UNUSED(av); UNUSED(g);
 }
@@ -697,19 +717,22 @@ void guarda_arcos(Agraph_t* ag, Agnode_t* av, grafo g) {
 void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 	Agedge_t 	*age;
     aresta		a;
-    vertice 	cabeca;
+    vertice 	vtmp;
     void		*tail, *head;
     char*		peso;
     char		str_peso[5] = "peso";
+    vertices	vs;
 
 	for( age=agfstedge(ag, agn); age; age=agnxtedge(ag, age, agn) ) {
 		tail = agtail(age);
 		head = aghead(age);
 
-		if( (Agnode_t*)head == agn )
-			cabeca = busca_vertice(agnameof(tail), g->vertices);
-		else
-			cabeca = busca_vertice(agnameof(head), g->vertices);
+		vs = busca_vertices(agnameof(tail), agnameof(head), g->vertices);
+		if( (Agnode_t*)head == agn ) {
+			vtmp = vs.origem;
+			vs.origem = vs.destino;
+			vs.destino = vtmp;
+		}
 
 		a = alloc_aresta();
 		peso = agget(age, str_peso);
@@ -718,7 +741,8 @@ void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 			a->ponderado = TRUE;
 		}
 
-		a->destino = cabeca;
+		a->origem = vs.origem;
+		a->destino = vs.destino;
 		insere_lista(a, v->vizinhos_esq);
 	}
 }
@@ -755,7 +779,7 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	no n;
 	aresta a;
 	vertice vcurr;
-	lint dist;
+	lint dist, dist_min;
 
 	lista T = constroi_lista();
 	insere_lista(u, T);
@@ -772,9 +796,13 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 
 	vcurr = conteudo(primeiro_no(T));
 	while( vcurr ) {
+		dist_min = LONG_MAX;
 		for( n=primeiro_no(vcurr->vizinhos_esq); n; n=proximo_no(n) ) {
 			a = conteudo(n);
-			dist = a->destino->distancia;
+			dist = a->origem->distancia + a->peso;
+			if( dist < a->destino->distancia )
+				a->destino->distancia = dist;
+			if( dist < dist_min ) dist_min = dist;
 		}
 	}
 
