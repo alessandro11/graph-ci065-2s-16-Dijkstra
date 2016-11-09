@@ -309,23 +309,24 @@ struct grafo {
 	lista	vertices;
 };
 
+typedef struct vertice* vertice;
 struct vertice {
 	char*	nome;
-	lista	vizinhos_esq;
 	lint	id;
 	lint	distancia;
 	Estado	estado;
+	vertice anterior;
+	lista	vizinhos_esq;
 	lista	vizinhos_dir;
 };
-typedef struct vertice* vertice;
 
+typedef struct aresta* aresta;
 struct aresta {
 	int		ponderado;
 	lint	peso;
 	vertice origem;
 	vertice	destino;
 };
-typedef struct aresta* aresta;
 
 int 	destroi_vertice(void*);
 int 	destroi_aresta(void*);
@@ -769,6 +770,19 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 	}
 }
 
+no vertice_min_dist(lista l) {
+	no n, min;
+	vertice u;
+
+	min = primeiro_no(l);
+	u = conteudo(min);
+	for( n=proximo_no(min); n; n=proximo_no(n) ) {
+		if( ((vertice)conteudo(n))->distancia < u->distancia )
+			u = conteudo(n);
+	}
+
+	return min;
+}
 //------------------------------------------------------------------------------
 // devolve uma lista de vértices de g representando o caminho mínimo
 // de u a v em g
@@ -778,33 +792,43 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 lista caminho_minimo(vertice u, vertice v, grafo g) {
 	no n;
 	aresta a;
-	vertice vcurr;
-	lint dist, dist_min;
+	vertice ucorr;
+	lint dist;
 
 	lista T = constroi_lista();
+	lista Q = constroi_lista();
 	insere_lista(u, T);
 
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
-		vcurr = conteudo(n);
-		vcurr->estado = NaoVisitado;
-		vcurr->distancia = infinito;
+		ucorr = conteudo(n);
+		ucorr->estado = NaoVisitado;
+		ucorr->distancia = infinito;
+		ucorr->anterior = NULL;
+		insere_lista(ucorr, Q);
 	}
 	u->estado = Visitado;
 	u->distancia = 0;
 
 	print_vattr(g);
+	while( tamanho_lista(Q) > 0 ) {
+		n = vertice_min_dist(Q);
+		ucorr = conteudo(n);
+		ucorr->estado = Visitado;
+		insere_lista(ucorr, T);
+		remove_no(Q, n, NULL);
 
-	vcurr = conteudo(primeiro_no(T));
-	while( vcurr ) {
-		dist_min = LONG_MAX;
-		for( n=primeiro_no(vcurr->vizinhos_esq); n; n=proximo_no(n) ) {
+		for( n=primeiro_no(ucorr->vizinhos_esq); n; n=proximo_no(n) ) {
 			a = conteudo(n);
-			dist = a->origem->distancia + a->peso;
-			if( dist < a->destino->distancia )
-				a->destino->distancia = dist;
-			if( dist < dist_min ) dist_min = dist;
+			if( a->destino->estado == NaoVisitado ) {
+				dist = a->origem->distancia + a->peso;
+				if( dist < a->destino->distancia ) {
+					a->destino->distancia = dist;
+					a->destino->anterior = ucorr;
+				}
+			}
 		}
 	}
+	print_vbyv(T);
 
 	return T;
 }
