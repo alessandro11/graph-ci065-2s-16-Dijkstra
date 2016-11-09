@@ -1,0 +1,5 @@
+strict graph "ciclo3" {
+	a -- b
+	b -- c
+	c -- a
+}

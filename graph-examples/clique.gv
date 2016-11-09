@@ -1,0 +1,11 @@
+strict graph "clique" {
+
+    "a"
+    "b"
+    "c"
+    
+    "a" -- "b"
+    "b" -- "c"
+    "c" -- "a"
+}
+

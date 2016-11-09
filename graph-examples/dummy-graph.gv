@@ -1,0 +1,12 @@
+strict graph "graphname" {
+
+    "a"
+    "b"
+    "c"
+    "d"
+
+    "b" -- "d"
+    "b" -- "c"
+    "a" -- "b"
+}
+
