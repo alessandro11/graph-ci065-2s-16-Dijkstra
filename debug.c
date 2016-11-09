@@ -21,14 +21,15 @@ typedef enum __Estado {
 	Visitado
 }Estado;
 
+typedef struct lista *lista;
 struct lista {
 
   unsigned int tamanho;
   int padding; // só pra evitar warning
   no primeiro;
 };
-typedef struct lista *lista;
 
+typedef struct grafo *grafo;
 struct grafo {
 	uint 	nvertices;
 	uint 	narestas;
@@ -37,25 +38,25 @@ struct grafo {
 	char*	nome;
 	lista	vertices;
 };
-typedef struct grafo *grafo;
 
+typedef struct vertice* vertice;
 struct vertice {
 	char*	nome;
-	lista	vizinhos_esq;
 	lint	id;
 	lint	distancia;
 	Estado	estado;
+	vertice anterior;
+	lista	vizinhos_esq;
 	lista	vizinhos_dir;
 };
-typedef struct vertice* vertice;
 
+typedef struct aresta* aresta;
 struct aresta {
 	int		ponderado;
 	lint	peso;
 	vertice origem;
 	vertice	destino;
 };
-typedef struct aresta* aresta;
 
 no primeiro_no(lista l);
 no proximo_no(no n);
@@ -68,6 +69,7 @@ void *conteudo(no n);
  */
 void print_a(vertice, lista);
 void print_v(grafo g);
+void print_attr(vertice v, lista l);
 
 /*____________________________________________________________________________*/
 void print_v(grafo g) {
@@ -83,6 +85,22 @@ void print_v(grafo g) {
 			print_a(v, v->vizinhos_esq);
 	}
 	fflush(stdout);
+}
+
+void print_vbyv(lista l) {
+	no n;
+	vertice v;
+
+	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
+		v = conteudo(n);
+        fprintf(stderr, "%s, Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        		v->nome,\
+				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
+				v->distancia,\
+				v->vizinhos_esq->tamanho);
+
+		print_attr(v, v->vizinhos_esq);
+	}
 }
 
 void print_a(vertice v, lista l) {
