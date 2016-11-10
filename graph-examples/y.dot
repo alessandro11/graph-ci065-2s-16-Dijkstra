@@ -1,0 +1,25 @@
+strict graph "youtube" {
+	splines=true;
+	sep="+25,25";
+	overlap=scalexy;
+	nodesep=0.8;
+	node [fontsize=11];
+	A;
+	B;
+	C;
+	D;
+	E;
+	F;
+	G;
+	A -- B ["peso"=4, label=4]
+	A -- C ["peso"=3, label=3]
+	A -- E ["peso"=7, label=7]
+	B -- C ["peso"=6, label=6]
+	B -- D ["peso"=5, label=5]
+	C -- D ["peso"=11, label=11]
+	C -- E ["peso"=8, label=8]
+	D -- E ["peso"=2 label=2]
+	D -- G ["peso"=10, label=10]
+	D -- F ["peso"=2, label=2]
+	F -- G ["peso"=3, label=3]
+}
