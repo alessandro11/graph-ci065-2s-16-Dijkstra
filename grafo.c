@@ -256,7 +256,13 @@ long int diametro(grafo g);
 #include <string.h>
 #include <stdlib.h>
 
-#define UNUSED(x)				(void)(x)
+typedef struct vertice* heap;
+typedef unsigned int uint;
+typedef long int lint;
+typedef unsigned short ushort;
+typedef int bool;
+
+heap* constroi_heap(grafo);
 
 #ifdef DEBUG
 
@@ -266,22 +272,16 @@ void print_a(vertice, lista);
 void print_v(grafo);
 void print_vattr(grafo);
 void print_vbylista(lista);
-
+void print_heap(heap*, unsigned int);
 #else
 
 #define print_a(vertice, lista)		(void)0
 #define print_v(grafo)				(void)0
 #define print_vattr(grafo)			(void)0
 #define print_vbylista(lista)		(void)0
+#define print_heap(heap, size)		(void)0
 
 #endif /* DEBUG */
-
-
-
-typedef unsigned int uint;
-typedef long int lint;
-typedef unsigned short ushort;
-typedef int bool;
 
 #ifndef TRUE
 #define TRUE            1
@@ -788,6 +788,54 @@ no vertice_min_dist(lista l) {
 
 	return min;
 }
+
+#define impar(n)		( ((n) % 2) != 0 )
+#define pai(i)			( impar(i) ? ( ((i)-1) / 2 ) : ( (i) / 2 ) )			// piso(i/2)
+#define filho_esq(i)	(2 * (i))
+#define filho_dir(i)	((2 * (i)) + 1)
+
+void troca(heap *h, uint i, uint i2) {
+	vertice utmp;
+
+	utmp = h[i];
+	h[i] = h[i2];
+	h[2] = utmp;
+}
+
+void decrementa_chave(heap *h, vertice u, uint i) {
+	uint idx = 0;
+
+	print_heap(h, i);
+	idx = pai(i);
+	do {
+		if( u->distancia > h[idx]->distancia )
+			troca(h, i, idx);
+		i = idx;
+	}while( (idx = pai(idx)) > 1 );
+}
+
+uint heap_size;
+heap* constroi_heap(grafo g) {
+	no 		n;
+	vertice u;
+	heap*	h;
+
+	h = (heap*)malloc((g->narestas+1) * sizeof(heap));
+	memset(h, 0, (g->narestas+1) * sizeof(heap));
+
+	n = primeiro_no(g->vertices);
+	h[1] = conteudo(n);
+	heap_size = 2;
+	for( n=proximo_no(n); n; n=proximo_no(n), heap_size++ ) {
+		u = conteudo(n);
+		h[heap_size] = u;
+		decrementa_chave(h, u, heap_size);
+	}
+	print_heap(h, heap_size);
+
+	return h;
+}
+
 //------------------------------------------------------------------------------
 // devolve uma lista de vértices de g representando o caminho mínimo
 // de u a v em g
@@ -799,28 +847,28 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	aresta a;
 	vertice ucorr;
 	lint dist;
+	heap* h;
 
-	lista T = constroi_lista();
-	lista Q = constroi_lista();
-	insere_lista(u, T);
+	lista T = NULL;
 
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		ucorr = conteudo(n);
 		ucorr->estado = NaoVisitado;
 		ucorr->distancia = infinito;
 		ucorr->anterior = NULL;
-		insere_lista(ucorr, Q);
 	}
+
 	u->estado = Visitado;
 	u->distancia = 0;
-
 	print_vattr(g);
-	while( tamanho_lista(Q) > 0 ) {
-		n = vertice_min_dist(Q);
+	h = constroi_heap(g);
+	print_heap(h, heap_size);
+
+	while( heap_size > 0 ) {
+//		n = vertice_min_dist(Q);
 		ucorr = conteudo(n);
 		ucorr->estado = Visitado;
-		insere_lista(ucorr, T);
-		remove_no(Q, n, NULL);
+//		remove_no(Q, n, NULL);
 
 		for( n=primeiro_no(ucorr->vizinhos_esq); n; n=proximo_no(n) ) {
 			a = conteudo(n);
@@ -833,7 +881,6 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 			}
 		}
 	}
-	print_vbylista(T);
 
 	return T;
 }
