@@ -87,13 +87,14 @@ void print_v(grafo g) {
 	fflush(stdout);
 }
 
-void print_vbyv(lista l) {
+void print_vbylista(lista l) {
 	no n;
 	vertice v;
 
 	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
 		v = conteudo(n);
-        fprintf(stderr, "%s, Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        fprintf(stderr, "(%s, %s), Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        		v->anterior->nome,\
         		v->nome,\
 				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
 				v->distancia,\
