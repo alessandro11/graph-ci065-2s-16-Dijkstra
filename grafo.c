@@ -263,14 +263,16 @@ long int diametro(grafo g);
 #define UNUSED(x)				(void)(x)
 
 void print_a(vertice, lista);
-void print_v(grafo g);
-void print_vattr(grafo g);
+void print_v(grafo);
+void print_vattr(grafo);
+void print_vbylista(lista);
 
 #else
 
 #define print_a(vertice, lista)		(void)0
 #define print_v(grafo)				(void)0
 #define print_vattr(grafo)			(void)0
+#define print_vbylista(lista)		(void)0
 
 #endif /* DEBUG */
 
@@ -671,9 +673,12 @@ grafo le_grafo(FILE *input) {
 
     agclose(Ag_g);
 
+    //https://www.youtube.com/watch?v=gdmfOwyQlcI
+    // binary heap
+    //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
     vertice u, v;
-    u = busca_vertice("a", g->vertices);
-    v = busca_vertice("e", g->vertices);
+    u = busca_vertice("A", g->vertices);
+    v = busca_vertice("B", g->vertices);
     caminho_minimo(u, v, g);
 
     return g;
@@ -828,7 +833,7 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 			}
 		}
 	}
-	print_vbyv(T);
+	print_vbylista(T);
 
 	return T;
 }
