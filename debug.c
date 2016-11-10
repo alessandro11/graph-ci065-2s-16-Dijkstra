@@ -15,6 +15,7 @@
 typedef unsigned int uint;
 typedef long int lint;
 typedef struct no *no;
+typedef struct vertice* heap;
 
 typedef enum __Estado {
 	NaoVisitado = 0,
@@ -158,5 +159,13 @@ void print_vattr(grafo g) {
 				v->vizinhos_esq->tamanho);
 
 		print_attr(v, v->vizinhos_esq);
+	}
+}
+
+void print_heap(heap *h, unsigned int size) {
+	unsigned int i;
+
+	for( i=1; i < size; i++ ) {
+		fprintf(stderr, "%u %s, dist=%ld\n", i, h[i]->nome, h[i]->distancia);
 	}
 }
