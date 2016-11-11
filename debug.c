@@ -165,6 +165,7 @@ void print_vattr(grafo g) {
 void print_heap(heap *h, unsigned int size) {
 	unsigned int i;
 
+	puts("");
 	for( i=1; i < size; i++ ) {
 		fprintf(stderr, "%u %s, dist=%ld\n", i, h[i]->nome, h[i]->distancia);
 	}
