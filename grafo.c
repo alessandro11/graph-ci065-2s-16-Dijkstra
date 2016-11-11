@@ -677,8 +677,8 @@ grafo le_grafo(FILE *input) {
     // binary heap
     //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
     vertice u, v;
-    u = busca_vertice("A", g->vertices);
-    v = busca_vertice("B", g->vertices);
+    u = busca_vertice("a", g->vertices);
+    v = busca_vertice("b", g->vertices);
     caminho_minimo(u, v, g);
 
     return g;
@@ -820,30 +820,23 @@ void decrementa_chave(heap *h, vertice u, uint pos) {
 }
 
 void bolha_baixo(heap *h, uint i) {
+	uint pai, fesq, fdir;
 
-	if( h[1]->distancia > h[filho_esq(1)]->distancia ) {
-		uint pai, fesq, fdir;
-
-		fesq = filho_esq(1);
-		troca(h, fesq, 1);
+	pai = 1;
+	fesq = filho_esq(pai);
+	fdir = filho_dir(pai);
+	while( (fesq < heap_pos && h[pai]->distancia > h[fesq]->distancia) ||\
+		   (fdir < heap_pos && h[pai]->distancia > h[fdir]->distancia) ) {
+		if( fesq < heap_pos && h[pai]->distancia > h[fesq]->distancia ) {
+			troca(h, pai, fesq);
+			pai = fesq;
+		}else if( fdir < heap_pos ){
+			troca(h, pai, fdir);
+			pai = fdir;
+		}
 		print_heap(h, heap_pos);
-		pai = fesq;
 		fesq = filho_esq(pai);
 		fdir = filho_dir(pai);
-		while(  (fesq < heap_pos && fdir < heap_pos) &&\
-				(h[pai]->distancia > h[fesq]->distancia ||\
-				h[pai]->distancia > h[fdir]->distancia) ) {
-			if( h[pai]->distancia > h[fesq]->distancia ) {
-				troca(h, pai, fesq);
-				pai = fesq;
-			}else {
-				troca(h, pai, fdir);
-				pai = fdir;
-			}
-			print_heap(h, heap_pos);
-			fesq = filho_esq(pai);
-			fdir = filho_dir(pai);
-		}
 	}
 }
 
@@ -852,6 +845,8 @@ vertice remove_min(heap *h) {
 	troca(h, --heap_pos, 1);
 	h[heap_pos] = NULL;
 	print_heap(h, heap_pos);
+	bolha_baixo(h, 1);
+	bolha_baixo(h, 1);		// verifique se subiu um menor que o lado direito.
 
 	return v;
 }
@@ -872,7 +867,6 @@ heap* constroi_heap(grafo g) {
 		h[heap_size++] = u;
 		decrementa_chave(h, u, heap_size);
 	}
-//	print_heap(h, heap_size);
 	heap_pos = heap_size;
 
 	return h;
@@ -897,7 +891,7 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 		ucorr = conteudo(n);
 		ucorr->estado = NaoVisitado;
 //		ucorr->distancia = infinito;
-		ucorr->distancia = (rand() % 20) + 1;
+		ucorr->distancia = rand() % 100;
 		ucorr->anterior = NULL;
 	}
 
@@ -908,22 +902,23 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	for( int i=1; i < heap_size; i++ ) {
 		ucorr = remove_min(h);
 	}
-	while( heap_size > 0 ) {
-		ucorr = conteudo(n);
-		ucorr->estado = Visitado;
+	free(h);
+//	while( heap_size > 0 ) {
+//		ucorr = conteudo(n);
+//		ucorr->estado = Visitado;
 //		remove_no(Q, n, NULL);
-
-		for( n=primeiro_no(ucorr->vizinhos_esq); n; n=proximo_no(n) ) {
-			a = conteudo(n);
-			if( a->destino->estado == NaoVisitado ) {
-				dist = a->origem->distancia + a->peso;
-				if( dist < a->destino->distancia ) {
-					a->destino->distancia = dist;
-					a->destino->anterior = ucorr;
-				}
-			}
-		}
-	}
+//
+//		for( n=primeiro_no(ucorr->vizinhos_esq); n; n=proximo_no(n) ) {
+//			a = conteudo(n);
+//			if( a->destino->estado == NaoVisitado ) {
+//				dist = a->origem->distancia + a->peso;
+//				if( dist < a->destino->distancia ) {
+//					a->destino->distancia = dist;
+//					a->destino->anterior = ucorr;
+//				}
+//			}
+//		}
+//	}
 
 	return T;
 }
