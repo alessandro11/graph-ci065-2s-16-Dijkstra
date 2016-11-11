@@ -819,33 +819,39 @@ void decrementa_chave(heap *h, vertice u, uint pos) {
 	}
 }
 
-vertice remove_min(heap *h) {
-	vertice v = (vertice)h[1];
-	troca(h, --heap_pos, 1);
-	print_heap(h, heap_pos);
+void bolha_baixo(heap *h, uint i) {
 
 	if( h[1]->distancia > h[filho_esq(1)]->distancia ) {
 		uint pai, fesq, fdir;
-//		(fesq < heap_pos && fdir < heap_pos) &&
+
 		fesq = filho_esq(1);
 		troca(h, fesq, 1);
 		print_heap(h, heap_pos);
 		pai = fesq;
 		fesq = filho_esq(pai);
 		fdir = filho_dir(pai);
-		while( h[pai]->distancia > h[fesq]->distancia || h[pai]->distancia > h[fdir]->distancia ) {
-//			if( h[pai]->distancia > h[fesq]->distancia ) {
-//				troca(h, pai, fesq);
-//				pai = fesq;
-//			}else {
-//				troca(h, pai, fdir);
-//				pai = fdir;
-//			}
-//			print_heap(h, heap_pos);
-//			fesq = filho_esq(pai);
-//			fdir = filho_dir(pai);
+		while(  (fesq < heap_pos && fdir < heap_pos) &&\
+				(h[pai]->distancia > h[fesq]->distancia ||\
+				h[pai]->distancia > h[fdir]->distancia) ) {
+			if( h[pai]->distancia > h[fesq]->distancia ) {
+				troca(h, pai, fesq);
+				pai = fesq;
+			}else {
+				troca(h, pai, fdir);
+				pai = fdir;
+			}
+			print_heap(h, heap_pos);
+			fesq = filho_esq(pai);
+			fdir = filho_dir(pai);
 		}
 	}
+}
+
+vertice remove_min(heap *h) {
+	vertice v = (vertice)h[1];
+	troca(h, --heap_pos, 1);
+	h[heap_pos] = NULL;
+	print_heap(h, heap_pos);
 
 	return v;
 }
