@@ -794,27 +794,62 @@ no vertice_min_dist(lista l) {
 #define filho_esq(i)	(2 * (i))
 #define filho_dir(i)	((2 * (i)) + 1)
 
+uint heap_size;
+uint heap_pos;
 void troca(heap *h, uint i, uint i2) {
 	vertice utmp;
 
 	utmp = h[i];
 	h[i] = h[i2];
-	h[2] = utmp;
+	h[i2] = utmp;
 }
 
-void decrementa_chave(heap *h, vertice u, uint i) {
-	uint idx = 0;
+void decrementa_chave(heap *h, vertice u, uint pos) {
+	uint i, ipai = 0;
 
-	print_heap(h, i);
-	idx = pai(i);
-	do {
-		if( u->distancia > h[idx]->distancia )
-			troca(h, i, idx);
-		i = idx;
-	}while( (idx = pai(idx)) > 1 );
+	print_heap(h, pos);
+	ipai = pos;
+	i = pos - 1;
+	while( (ipai = pai(ipai)) > 0 ) {
+		if( h[ipai]->distancia > u->distancia ) {
+			troca(h, i, ipai);
+			i = ipai;
+			print_heap(h, pos);
+		}
+	}
 }
 
-uint heap_size;
+vertice remove_min(heap *h) {
+	vertice v = (vertice)h[1];
+	troca(h, --heap_pos, 1);
+	print_heap(h, heap_pos);
+
+	if( h[1]->distancia > h[filho_esq(1)]->distancia ) {
+		uint pai, fesq, fdir;
+//		(fesq < heap_pos && fdir < heap_pos) &&
+		fesq = filho_esq(1);
+		troca(h, fesq, 1);
+		print_heap(h, heap_pos);
+		pai = fesq;
+		fesq = filho_esq(pai);
+		fdir = filho_dir(pai);
+		while( h[pai]->distancia > h[fesq]->distancia || h[pai]->distancia > h[fdir]->distancia ) {
+//			if( h[pai]->distancia > h[fesq]->distancia ) {
+//				troca(h, pai, fesq);
+//				pai = fesq;
+//			}else {
+//				troca(h, pai, fdir);
+//				pai = fdir;
+//			}
+//			print_heap(h, heap_pos);
+//			fesq = filho_esq(pai);
+//			fdir = filho_dir(pai);
+		}
+	}
+
+	return v;
+}
+
 heap* constroi_heap(grafo g) {
 	no 		n;
 	vertice u;
@@ -826,12 +861,13 @@ heap* constroi_heap(grafo g) {
 	n = primeiro_no(g->vertices);
 	h[1] = conteudo(n);
 	heap_size = 2;
-	for( n=proximo_no(n); n; n=proximo_no(n), heap_size++ ) {
+	for( n=proximo_no(n); n; n=proximo_no(n) ) {
 		u = conteudo(n);
-		h[heap_size] = u;
+		h[heap_size++] = u;
 		decrementa_chave(h, u, heap_size);
 	}
-	print_heap(h, heap_size);
+//	print_heap(h, heap_size);
+	heap_pos = heap_size;
 
 	return h;
 }
@@ -849,12 +885,13 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	lint dist;
 	heap* h;
 
+	srandom(time(NULL));
 	lista T = NULL;
-
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		ucorr = conteudo(n);
 		ucorr->estado = NaoVisitado;
-		ucorr->distancia = infinito;
+//		ucorr->distancia = infinito;
+		ucorr->distancia = (rand() % 20) + 1;
 		ucorr->anterior = NULL;
 	}
 
@@ -862,10 +899,10 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	u->distancia = 0;
 	print_vattr(g);
 	h = constroi_heap(g);
-	print_heap(h, heap_size);
-
+	for( int i=1; i < heap_size; i++ ) {
+		ucorr = remove_min(h);
+	}
 	while( heap_size > 0 ) {
-//		n = vertice_min_dist(Q);
 		ucorr = conteudo(n);
 		ucorr->estado = Visitado;
 //		remove_no(Q, n, NULL);
