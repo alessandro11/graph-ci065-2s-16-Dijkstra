@@ -3,12 +3,16 @@ TEAM = ae11
 
 CC = gcc
 INCLUDE = .
-CFLAGS = -O3 -Wall
+CFLAGS = -std=c99 -Wall
 DEFINES =
+OBJS = teste.o grafo.o
 
-ifdef DEBUG
+ifndef DEBUG
+	CFLAGS += -O3
+else
 	DEFINES = -DDEBUG
-	CFLAGS = -g -Wall
+	CFLAGS += -g
+	OBJS += debug.o
 endif
 
 .SUFFIXES:		.c
@@ -17,7 +21,7 @@ endif
 
 all: teste
 
-teste: teste.o grafo.o
+teste: $(OBJS)
 	$(CC) -o $(@) $^ -l cgraph
 
 grafo.o: grafo.c grafo.h
