@@ -316,7 +316,7 @@ struct grafo {
 typedef struct vertice* vertice;
 struct vertice {
 	char*	nome;
-	lint	id;
+	uint	id;
 	lint	distancia;
 	Estado	estado;
 	vertice anterior;
@@ -596,6 +596,7 @@ aresta 	alloc_aresta(void);
 aresta 	dup_aresta(aresta);
 char* 	str_dup(const char*);
 vertice busca_vertice(const char*, lista);
+void 	dijkstra(vertice, grafo);
 
 grafo alloc_grafo(void) {
 	grafo g = (grafo)calloc(1, sizeof(struct grafo));
@@ -685,6 +686,8 @@ grafo le_grafo(FILE *input) {
     lista T = caminho_minimo(u, v, g);
     print_vbylista(T);
     destroi_lista(T, NULL);
+    lista *T2;
+	caminhos_minimos(&T2, g);
 
     return g;
 }
@@ -761,11 +764,13 @@ void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 void constroi_grafo(Agraph_t* ag, grafo g) {
 	Agnode_t*	agn;
 	vertice		v;
+	uint 		id = 0;
 
 	// Armazene a lista de vértices; deste modo podemos
 	// apenas apontar as arestas para os respectivos vértices.
 	for( agn=agfstnode(ag); agn; agn=agnxtnode(ag, agn) ) {
 		v = alloc_vertice(agnameof(agn));
+		v->id = id++;
 		insere_lista(v, g->vertices);
 	}
 
@@ -919,20 +924,13 @@ heap* constroi_heap(grafo g) {
 	return h;
 }
 
-//------------------------------------------------------------------------------
-// devolve uma lista de vértices de g representando o caminho mínimo
-// de u a v em g
-//
-// a lista é vazia se u e v estão em componentes diferentes de g
-
-lista caminho_minimo(vertice u, vertice v, grafo g) {
+void dijkstra(vertice u, grafo g) {
 	no n;
 	aresta a;
 	vertice ucorr;
 	lint dist;
 	heap* h;
 
-	lista T = NULL;
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		ucorr = conteudo(n);
 		ucorr->estado = NaoVisitado;
@@ -960,6 +958,18 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 			}
 		}
 	}
+}
+
+//------------------------------------------------------------------------------
+// devolve uma lista de vértices de g representando o caminho mínimo
+// de u a v em g
+//
+// a lista é vazia se u e v estão em componentes diferentes de g
+
+lista caminho_minimo(vertice u, vertice v, grafo g) {
+	lista T = NULL;
+
+	dijkstra(u, g);
 
 	// Constroi lista com o menor caminho, percorrendo do objetivo
 	// a origem.
@@ -972,4 +982,40 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	}
 
 	return T;
+}
+
+//------------------------------------------------------------------------------
+// preenche a matriz c com caminhos mínimos entre os vértices de g de
+// maneira que c[indice(u,g)][indice(v,g)] tenha um caminho mínimo
+// entre os vértices u e v em g
+//
+// devolve c
+
+lista **caminhos_minimos(lista **c, grafo g) {
+	no n, n2;
+	uint i, j;
+	vertice v;
+	lista **l;
+
+	l = c = (lista**)calloc(g->nvertices, sizeof(lista**));
+	for( n=primeiro_no(g->vertices), i=0; n; n=proximo_no(n), i++ ) {
+		l[i] = (lista*)calloc(g->nvertices, sizeof(lista*));
+		v = conteudo(n);
+		l[i][v->id] = constroi_lista();
+		insere_lista(v, l[i][v->id]);
+		for( n2=primeiro_no(g->vertices), j=0; n2; n2=proximo_no(n2), j++ ) {
+			if( n2 != n ) {
+				v = conteudo(n2);
+
+				vertice p = v->anterior;
+				while( p ) {
+					insere_lista(p, l[i][j]);
+					p = p->anterior;
+				}
+			}
+		}
+		++l;
+	}
+
+	return c;
 }
