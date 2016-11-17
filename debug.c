@@ -36,6 +36,7 @@ struct grafo {
 	uint 	narestas;
 	int		direcionado;
 	int		ponderado;
+	lint	diametro;
 	char*	nome;
 	lista	vertices;
 };
@@ -43,7 +44,7 @@ struct grafo {
 typedef struct vertice* vertice;
 struct vertice {
 	char*	nome;
-	lint	id;
+	uint	id;
 	lint	distancia;
 	Estado	estado;
 	vertice anterior;
@@ -81,7 +82,7 @@ void print_v(grafo g) {
 	printf("Grafo %s=%p\n", g->nome, g);
 	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
 			v = conteudo(n);
-			printf("%s=%p\n", v->nome, v);
+			printf("%u %s=%p\n", v->id, v->nome, v);
 			printf("\tV.:\n");
 			print_a(v, v->vizinhos_esq);
 	}
