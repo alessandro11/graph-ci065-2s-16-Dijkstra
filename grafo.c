@@ -679,7 +679,8 @@ grafo le_grafo(FILE *input) {
     vertice u, v;
     u = busca_vertice("A", g->vertices);
     v = busca_vertice("F", g->vertices);
-    caminho_minimo(u, v, g);
+    lista T = caminho_minimo(u, v, g);
+    print_vbylista(T);
 
     return g;
 }
@@ -881,6 +882,18 @@ uint busca_elem_heap(heap *h, heap ele) {
 	return pos;
 }
 
+uint busca_elem_heap_linear(heap *h, heap ele) {
+	uint e = 0, i = 1;
+
+	while( h[i] && !e ) {
+		if( h[i] == ele )
+			e = i;
+		++i;
+	}
+
+	return e;
+}
+
 heap* constroi_heap(grafo g) {
 	no 		n;
 	vertice u;
@@ -915,13 +928,11 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	lint dist;
 	heap* h;
 
-//	srandom(time(NULL));
 	lista T = NULL;
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		ucorr = conteudo(n);
 		ucorr->estado = NaoVisitado;
 		ucorr->distancia = infinito;
-//		ucorr->distancia = rand() % 100;
 		ucorr->anterior = NULL;
 	}
 
@@ -940,10 +951,20 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 				if( dist < a->destino->distancia ) {
 					a->destino->distancia = dist;
 					a->destino->anterior = ucorr;
-					decrementa_chave(h, busca_elem_heap(h, a->destino));
+					decrementa_chave(h, busca_elem_heap_linear(h, a->destino));
 				}
 			}
 		}
+	}
+
+	// Constroi lista com o menor caminho, percorrendo do objetivo
+	// a origem.
+	T = constroi_lista();
+	insere_lista(v, T);
+	vertice p = v->anterior;
+	while( p ) {
+		insere_lista(p, T);
+		p = p->anterior;
 	}
 
 	return T;
