@@ -95,7 +95,7 @@ void print_vbylista(lista l) {
 	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
 		v = conteudo(n);
         fprintf(stderr, "(%s, %s), Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
-        		v->anterior->nome,\
+        		v->anterior ? v->anterior->nome : "NULL",\
         		v->nome,\
 				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
 				v->distancia,\
