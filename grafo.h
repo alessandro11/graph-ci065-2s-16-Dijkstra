@@ -202,7 +202,7 @@ long int **distancias(unsigned int **d, grafo g);
 // maneira que c[indice(u,g)][indice(v,g)] tenha um caminho mínimo 
 // entre os vértices u e v em g
 //
-// devolve d
+// devolve c
 
 lista **caminhos_minimos(lista **c, grafo g);
 
