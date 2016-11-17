@@ -18,6 +18,7 @@
  * =====================================================================================
  */
 
+#include "grafo.h"
 #include <malloc.h>
 #include <stdio.h>
 #include <limits.h>
@@ -307,6 +308,7 @@ struct grafo {
 	uint 	narestas;
 	int		direcionado;
 	int		ponderado;
+	lint	diametro;
 	char*	nome;
 	lista	vertices;
 };
@@ -597,6 +599,7 @@ vertice busca_vertice(const char*, lista);
 
 grafo alloc_grafo(void) {
 	grafo g = (grafo)calloc(1, sizeof(struct grafo));
+	g->diametro = LONG_MAX;
 	return g;
 }
 
@@ -681,6 +684,7 @@ grafo le_grafo(FILE *input) {
     v = busca_vertice("F", g->vertices);
     lista T = caminho_minimo(u, v, g);
     print_vbylista(T);
+    destroi_lista(T, NULL);
 
     return g;
 }
