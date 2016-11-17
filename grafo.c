@@ -993,25 +993,25 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 
 lista **caminhos_minimos(lista **c, grafo g) {
 	no n, n2;
-	uint i, j;
-	vertice v;
+	vertice u, v;
 	lista **l;
 
 	l = c = (lista**)calloc(g->nvertices, sizeof(lista**));
-	for( n=primeiro_no(g->vertices), i=0; n; n=proximo_no(n), i++ ) {
-		l[i] = (lista*)calloc(g->nvertices, sizeof(lista*));
-		v = conteudo(n);
-		l[i][v->id] = constroi_lista();
-		insere_lista(v, l[i][v->id]);
-		for( n2=primeiro_no(g->vertices), j=0; n2; n2=proximo_no(n2), j++ ) {
+	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
+		*l = (lista*)calloc(g->nvertices, sizeof(lista*));
+		u = conteudo(n);
+		for( n2=primeiro_no(g->vertices); n2; n2=proximo_no(n2) ) {
 			if( n2 != n ) {
 				v = conteudo(n2);
+				l[u->id][v->id] = constroi_lista();
 
 				vertice p = v->anterior;
 				while( p ) {
-					insere_lista(p, l[i][j]);
+					insere_lista(p, l[u->id][v->id]);
 					p = p->anterior;
 				}
+
+				(*l)++;
 			}
 		}
 		++l;
