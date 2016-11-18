@@ -1014,6 +1014,7 @@ lista **caminhos_minimos(lista **c, grafo g) {
 			}else {
 				c[u->id][v->id] = constroi_lista();
 
+				insere_lista(v, c[u->id][v->id]);
 				vertice p = v->anterior;
 				while( p ) {
 					insere_lista(p, c[u->id][v->id]);
