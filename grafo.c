@@ -274,6 +274,8 @@ void print_v(grafo);
 void print_vattr(grafo);
 void print_vbylista(lista);
 void print_heap(heap*);
+void print_mat(lista**, grafo);
+
 #else
 
 #define print_a(vertice, lista)		(void)0
@@ -281,6 +283,7 @@ void print_heap(heap*);
 #define print_vattr(grafo)			(void)0
 #define print_vbylista(lista)		(void)0
 #define print_heap(heap)			(void)0
+#define print_mat(lista, grafo)		(void)0
 
 #endif /* DEBUG */
 
@@ -686,8 +689,14 @@ grafo le_grafo(FILE *input) {
     lista T = caminho_minimo(u, v, g);
     print_vbylista(T);
     destroi_lista(T, NULL);
-    lista *T2;
-	caminhos_minimos(&T2, g);
+
+    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
+	lista **p = T2;
+	for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
+		*p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
+
+	caminhos_minimos(T2, g);
+	print_mat(T2, g);
 
     return g;
 }
@@ -994,27 +1003,24 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 lista **caminhos_minimos(lista **c, grafo g) {
 	no n, n2;
 	vertice u, v;
-	lista **l;
 
-	l = c = (lista**)calloc(g->nvertices, sizeof(lista**));
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
-		*l = (lista*)calloc(g->nvertices, sizeof(lista*));
 		u = conteudo(n);
+		dijkstra(u, g);
 		for( n2=primeiro_no(g->vertices); n2; n2=proximo_no(n2) ) {
-			if( n2 != n ) {
-				v = conteudo(n2);
-				l[u->id][v->id] = constroi_lista();
+			v = conteudo(n2);
+			if( u == v ) {
+				c[u->id][v->id] = constroi_lista();
+			}else {
+				c[u->id][v->id] = constroi_lista();
 
 				vertice p = v->anterior;
 				while( p ) {
-					insere_lista(p, l[u->id][v->id]);
+					insere_lista(p, c[u->id][v->id]);
 					p = p->anterior;
 				}
-
-				(*l)++;
 			}
 		}
-		++l;
 	}
 
 	return c;
