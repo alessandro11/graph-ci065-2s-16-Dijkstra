@@ -173,3 +173,42 @@ void print_heap(heap *h) {
 		p++;
 	}
 }
+
+const char *busca_nome(unsigned int id, grafo g) {
+	const char *p = NULL;
+	vertice u;
+
+	for( no n=primeiro_no(g->vertices); n && !p; n=proximo_no(n) ) {
+		u = conteudo(n);
+		if( u->id == id )
+			p = u->nome;
+	}
+
+	return p;
+}
+
+void print_mat(lista **m, grafo g) {
+	lista l;
+	no n;
+	vertice u;
+	unsigned int i, j;
+
+	for( i=0; i < g->nvertices; i++ ) {
+		for( j=0; j < g->nvertices; j++ ) {
+			fprintf(stderr, "(%u %u, %s %s)\n", i, j,\
+					busca_nome(i, g), busca_nome(j, g));
+
+			l = m[i][j];
+			n = primeiro_no(l);
+			if( n ) {
+				u = conteudo(n);
+				fprintf(stderr, "\t%s %ld", u->nome, u->distancia);
+				for( n=proximo_no(n); n; n=proximo_no(n) ) {
+					u = conteudo(n);
+					fprintf(stderr, " -> %s %ld", u->nome, u->distancia);
+				}
+				puts("");
+			}
+		}
+	}
+}
