@@ -193,14 +193,18 @@ unsigned int indice(vertice v, grafo g);
 // maneira que d[indice(u,g)][indice(v,g)] tenha o valor da distância
 // entre os vértices u e v em g
 //
+// quando g é ponderado, os pesos são todos não negativos
+//
 // devolve d
 
-long int **distancias(unsigned int **d, grafo g);
+long int **distancias(long int **d, grafo g);
 
 //------------------------------------------------------------------------------
 // preenche a matriz c com caminhos mínimos entre os vértices de g de
 // maneira que c[indice(u,g)][indice(v,g)] tenha um caminho mínimo 
 // entre os vértices u e v em g
+//
+// quando g é ponderado, os pesos são todos não negativos
 //
 // devolve c
 
