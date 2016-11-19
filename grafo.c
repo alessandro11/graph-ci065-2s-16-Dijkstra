@@ -683,12 +683,12 @@ grafo le_grafo(FILE *input) {
     //https://www.youtube.com/watch?v=gdmfOwyQlcI
     // binary heap
     //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
-    vertice u, v;
-    u = busca_vertice("A", g->vertices);
-    v = busca_vertice("F", g->vertices);
-    lista T = caminho_minimo(u, v, g);
-    print_vbylista(T);
-    destroi_lista(T, NULL);
+//    vertice u, v;
+//    u = busca_vertice("A", g->vertices);
+//    v = busca_vertice("F", g->vertices);
+//    lista T = caminho_minimo(u, v, g);
+//    print_vbylista(T);
+//    destroi_lista(T, NULL);
 
     lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
 	lista **p = T2;
@@ -1014,6 +1014,7 @@ lista **caminhos_minimos(lista **c, grafo g) {
 			}else {
 				c[u->id][v->id] = constroi_lista();
 
+				insere_lista(v, c[u->id][v->id]);
 				vertice p = v->anterior;
 				while( p ) {
 					insere_lista(p, c[u->id][v->id]);

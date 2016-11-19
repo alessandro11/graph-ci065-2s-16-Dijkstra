@@ -202,12 +202,12 @@ void print_mat(lista **m, grafo g) {
 			n = primeiro_no(l);
 			if( n ) {
 				u = conteudo(n);
-				fprintf(stderr, "\t%s %ld", u->nome, u->distancia);
+				fprintf(stderr, "\t%s", u->nome);
 				for( n=proximo_no(n); n; n=proximo_no(n) ) {
 					u = conteudo(n);
-					fprintf(stderr, " -> %s %ld", u->nome, u->distancia);
+					fprintf(stderr, "->%s", u->nome);
 				}
-				puts("");
+				fprintf(stderr, " distancia = %ld\n", u->distancia);
 			}
 		}
 	}
