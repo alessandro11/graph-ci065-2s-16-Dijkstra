@@ -153,7 +153,8 @@ void print_vattr(grafo g) {
 	printf("Grafo %s=%p\n", g->nome, g);
 	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
 		v = conteudo(n);
-        fprintf(stderr, "%s, Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        fprintf(stderr, "%u %s, Estado=%s, Distancia=%ld, possui %u aresta(s).\n",\
+        		v->id,\
         		v->nome,\
 				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
 				v->distancia,\
