@@ -707,11 +707,15 @@ grafo le_grafo(FILE *input) {
 	print_mat(T2, g);
 
 	uint i, j;
+	p = T2;
 	for( i=0; i < g->nvertices; i++  ) {
 		for( j=0; j< g->nvertices; j++ ) {
 			destroi_lista(T2[i][j], destroi_vertice);
 		}
+
+		free(*p++);
 	}
+	free(T2);
 
 
     return g;
