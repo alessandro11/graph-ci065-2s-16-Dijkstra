@@ -636,6 +636,14 @@ aresta dup_aresta(aresta a) {
 	return p;
 }
 
+vertice dup_vertice(vertice u) {
+	vertice v = alloc_vertice(u->nome);
+	v->id = u->id;
+	v->distancia = u->distancia;
+
+	return v;
+}
+
 char* str_dup(const char* str) {
 	char* p = (char*)calloc(1, strlen(str)+1);
 	if( p )
@@ -697,6 +705,14 @@ grafo le_grafo(FILE *input) {
 
 	caminhos_minimos(T2, g);
 	print_mat(T2, g);
+
+	uint i, j;
+	for( i=0; i < g->nvertices; i++  ) {
+		for( j=0; j< g->nvertices; j++ ) {
+			destroi_lista(T2[i][j], destroi_vertice);
+		}
+	}
+
 
     return g;
 }
@@ -826,13 +842,13 @@ void troca(heap *h, uint i, uint i2) {
 void decrementa_chave(heap *h, uint pos) {
 	uint pai_ant, pai = 0;
 
-	print_heap(h);
+//	print_heap(h);
 	pai_ant = pai = pos;
 	while( (pai = pai(pai)) > 0 ) {
 		if( h[pai]->distancia > h[pai_ant]->distancia ) {
 			troca(h, pai_ant, pai);
 			pai_ant = pai;
-			print_heap(h);
+//			print_heap(h);
 		}
 	}
 }
@@ -856,7 +872,7 @@ void bolha_baixo(heap *h, uint i) {
 			troca(h, pai, fdir);
 			pai = fdir;
 		}
-		print_heap(h);
+//		print_heap(h);
 		fesq = filho_esq(pai);
 		fdir = filho_dir(pai);
 	}
@@ -866,7 +882,7 @@ vertice remove_min(heap *h) {
 	vertice v = (vertice)h[1];
 	troca(h, --heap_pos, 1);
 	h[heap_pos] = NULL;
-	print_heap(h);
+//	print_heap(h);
 	bolha_baixo(h, 1);
 	bolha_baixo(h, 1);		// verifique se subiu um menor que o lado direito
 							// e este pode estar na raiz.
@@ -949,7 +965,7 @@ void dijkstra(vertice u, grafo g) {
 
 	u->estado = Visitado;
 	u->distancia = 0;
-	print_vattr(g);
+//	print_vattr(g);
 	h = constroi_heap(g);
 	while( *(h+1) != NULL ) {
 		ucorr = remove_min(h);
@@ -1006,7 +1022,10 @@ lista **caminhos_minimos(lista **c, grafo g) {
 
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		u = conteudo(n);
+		print_vattr(g);
 		dijkstra(u, g);
+		fprintf(stderr, "\n\n");
+		print_vattr(g);
 		for( n2=primeiro_no(g->vertices); n2; n2=proximo_no(n2) ) {
 			v = conteudo(n2);
 			if( u == v ) {
@@ -1014,10 +1033,10 @@ lista **caminhos_minimos(lista **c, grafo g) {
 			}else {
 				c[u->id][v->id] = constroi_lista();
 
-				insere_lista(v, c[u->id][v->id]);
+				insere_lista(dup_vertice(v), c[u->id][v->id]);
 				vertice p = v->anterior;
 				while( p ) {
-					insere_lista(p, c[u->id][v->id]);
+					insere_lista(dup_vertice(p), c[u->id][v->id]);
 					p = p->anterior;
 				}
 			}
