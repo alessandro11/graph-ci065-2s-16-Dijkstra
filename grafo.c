@@ -230,7 +230,7 @@ unsigned int indice(vertice v, grafo g);
 //
 // devolve d
 
-long int **distancias(unsigned int **d, grafo g);
+long int **distancias(long int **d, grafo g);
 
 //------------------------------------------------------------------------------
 // preenche a matriz c com caminhos mínimos entre os vértices de g de
@@ -275,6 +275,7 @@ void print_vattr(grafo);
 void print_vbylista(lista);
 void print_heap(heap*);
 void print_mat(lista**, grafo);
+void print_mat_dist(lint**, grafo);
 
 #else
 
@@ -284,6 +285,7 @@ void print_mat(lista**, grafo);
 #define print_vbylista(lista)		(void)0
 #define print_heap(heap)			(void)0
 #define print_mat(lista, grafo)		(void)0
+#define print_mat_dist(dist_m, grafo)(void)0
 
 #endif /* DEBUG */
 
@@ -698,25 +700,35 @@ grafo le_grafo(FILE *input) {
 //    print_vbylista(T);
 //    destroi_lista(T, NULL);
 
-    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
-	lista **p = T2;
-	for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
-		*p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
+//    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
+//	lista **p = T2;
+//	for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
+//		*p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
 
-	caminhos_minimos(T2, g);
-	print_mat(T2, g);
+//	caminhos_minimos(T2, g);
+//	print_mat(T2, g);
 
-	uint i, j;
-	p = T2;
-	for( i=0; i < g->nvertices; i++  ) {
-		for( j=0; j< g->nvertices; j++ ) {
-			destroi_lista(T2[i][j], destroi_vertice);
-		}
+	uint i;
+//	p = T2;
+//	for( i=0; i < g->nvertices; i++  ) {
+//		for( j=0; j< g->nvertices; j++ ) {
+//			destroi_lista(T2[i][j], destroi_vertice);
+//		}
+//
+//		free(*p++);
+//	}
+//	free(T2);
 
-		free(*p++);
+	lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
+	for( i=0; i < g->nvertices; i++ ) {
+		dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
 	}
-	free(T2);
-
+	distancias(dist, g);
+	print_mat_dist(dist, g);
+	for( i=0; i < g->nvertices; i++ ) {
+		free(dist[i]);
+	}
+	free(dist);
 
     return g;
 }
@@ -987,6 +999,7 @@ void dijkstra(vertice u, grafo g) {
 			}
 		}
 	}
+	free(h);
 }
 
 //------------------------------------------------------------------------------
@@ -1026,10 +1039,7 @@ lista **caminhos_minimos(lista **c, grafo g) {
 
 	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
 		u = conteudo(n);
-		print_vattr(g);
 		dijkstra(u, g);
-		fprintf(stderr, "\n\n");
-		print_vattr(g);
 		for( n2=primeiro_no(g->vertices); n2; n2=proximo_no(n2) ) {
 			v = conteudo(n2);
 			if( u == v ) {
@@ -1048,4 +1058,33 @@ lista **caminhos_minimos(lista **c, grafo g) {
 	}
 
 	return c;
+}
+
+//------------------------------------------------------------------------------
+// preenche a matriz d com as distâncias entre os vértices de g de
+// maneira que d[indice(u,g)][indice(v,g)] tenha o valor da distância
+// entre os vértices u e v em g
+//
+// quando g é ponderado, os pesos são todos não negativos
+//
+// devolve d
+
+long int **distancias(long int **d, grafo g) {
+	no n, n2;
+	vertice u, v;
+
+	for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
+		u = conteudo(n);
+		dijkstra(u, g);
+		for( n2=primeiro_no(g->vertices); n2; n2=proximo_no(n2) ) {
+			v = conteudo(n2);
+			if( u == v )
+				d[u->id][v->id] = 0;
+			else
+				d[u->id][v->id] = v->distancia;
+		}
+	}
+
+	return d;
+
 }
