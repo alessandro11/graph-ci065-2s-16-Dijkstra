@@ -325,7 +325,7 @@ struct vertice {
 	lint	distancia;
 	Estado	estado;
 	vertice anterior;
-	lista	vizinhos_esq;
+	lista	vizinhos_sai;
 	lista	vizinhos_dir;
 };
 
@@ -391,7 +391,7 @@ grafo escreve_grafo(FILE *output, grafo g) {
     ch = direcionado(g) ? '>' : '-';
     for( n=primeiro_no(g->vertices); n; n=proximo_no(n) ) {
         v = (vertice)conteudo(n);
-        for( na=primeiro_no(v->vizinhos_esq); na; na=proximo_no(na) ) {
+        for( na=primeiro_no(v->vizinhos_sai); na; na=proximo_no(na) ) {
             a = (aresta)conteudo(na);
             fprintf(output, "    \"%s\" -%c \"%s\"", v->nome, ch, a->destino->nome);
 
@@ -424,7 +424,7 @@ int destroi_vertice(void *v) {
 	int ret = 1;
 
 	free( ((vertice)v)->nome );
-	ret = destroi_lista( ((vertice)v)->vizinhos_esq, destroi_aresta );
+	ret = destroi_lista( ((vertice)v)->vizinhos_sai, destroi_aresta );
 	free(v);
 
 	return ret;
@@ -601,7 +601,7 @@ vertice alloc_vertice(const char* nome) {
 	vertice v = (vertice)calloc(1, sizeof(struct vertice));
 	if( v ) {
 		v->nome = str_dup(nome);
-		v->vizinhos_esq = constroi_lista();
+		v->vizinhos_sai = constroi_lista();
 //		v->vizinhos_dir = constroi_lista();
 	}
 
@@ -674,55 +674,6 @@ grafo le_grafo(FILE *input) {
     constroi_grafo(Ag_g, g);
     agclose(Ag_g);
 
-    //https://www.youtube.com/watch?v=gdmfOwyQlcI
-    // binary heap
-    //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
-//    vertice u, v;
-//    u = busca_vertice("A", g->vertices);
-//    v = busca_vertice("F", g->vertices);
-//    lista T = caminho_minimo(u, v, g);
-//    print_vbylista(T);
-//    destroi_lista(T, NULL);
-
-    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
-      lista **p = T2;
-      for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
-              *p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
-
-      caminhos_minimos(T2, g);
-      print_mat(T2, g);
-      return g;
-
-//    fprintf(stderr, "%d\n", direcionado(g));
-//    return g;
-//    uint i;
-//      p = T2;
-//      for( i=0; i < g->nvertices; i++  ) {
-//              for( j=0; j< g->nvertices; j++ ) {
-//                      destroi_lista(T2[i][j], destroi_vertice);
-//              }
-//
-//              free(*p++);
-//      }
-//      free(T2);
-
-//      vertice u = busca_vertice("A", g->vertices);
-//      vertice v = busca_vertice("G", g->vertices);
-//      fprintf(stderr, "%ld\n", distancia(u, v, g));
-//      return g;
-//      fprintf(stderr, "%ld\n", diametro(g));
-
-//        lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
-//        for( i=0; i < g->nvertices; i++ ) {
-//                dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
-//        }
-//        distancias(dist, g);
-//        print_mat_dist(dist, g);
-//        for( i=0; i < g->nvertices; i++ ) {
-//                free(dist[i]);
-//        }
-//        free(dist);
-
     return g;
 }
 
@@ -759,7 +710,15 @@ vertices busca_vertices(const char* nome_orig, const char* nome_dest, lista l) {
 }
 
 void guarda_arcos(Agraph_t* ag, Agnode_t* av, grafo g) {
+	Agedge_t *aga;
 
+	for( aga=agfstout(ag, av); aga; aga=agnxtout(ag, aga) ) {
+		fprintf(stderr, "%s->%s\n", agnameof(agtail(aga)), agnameof(aghead(aga)));
+	}
+
+	for( aga=agfstin(ag, av); aga; aga=agnxtin(ag, aga) ) {
+		fprintf(stderr, "%s->%s\n", agnameof(agtail(aga)), agnameof(aghead(aga)));
+	}
 }
 
 void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
@@ -791,7 +750,7 @@ void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 
 		a->origem = vs.origem;
 		a->destino = vs.destino;
-		insere_lista(a, v->vizinhos_esq);
+		insere_lista(a, v->vizinhos_sai);
 	}
 }
 
@@ -981,7 +940,7 @@ void dijkstra(vertice u, grafo g) {
 		ucorr = remove_min(h);
 		ucorr->estado = Visitado;
 
-		for( n=primeiro_no(ucorr->vizinhos_esq); n; n=proximo_no(n) ) {
+		for( n=primeiro_no(ucorr->vizinhos_sai); n; n=proximo_no(n) ) {
 			a = conteudo(n);
 			if( a->destino->estado == NaoVisitado ) {
 				dist = a->origem->distancia + a->peso;
@@ -1124,7 +1083,7 @@ unsigned int grau(vertice v, int direcao, grafo g) {
 
 	switch( direcao ) {
 	case 0:
-		ret = v->vizinhos_esq->tamanho;
+		ret = v->vizinhos_sai->tamanho;
 		break;
 	case 1:
 		break;

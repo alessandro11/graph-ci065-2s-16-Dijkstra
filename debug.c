@@ -48,7 +48,7 @@ struct vertice {
 	lint	distancia;
 	Estado	estado;
 	vertice anterior;
-	lista	vizinhos_esq;
+	lista	vizinhos_sai;
 	lista	vizinhos_dir;
 };
 
@@ -84,7 +84,7 @@ void print_v(grafo g) {
 			v = conteudo(n);
 			printf("%u %s=%p\n", v->id, v->nome, v);
 			printf("\tV.:\n");
-			print_a(v, v->vizinhos_esq);
+			print_a(v, v->vizinhos_sai);
 	}
 	fflush(stdout);
 }
@@ -100,9 +100,9 @@ void print_vbylista(lista l) {
         		v->nome,\
 				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
 				v->distancia,\
-				v->vizinhos_esq->tamanho);
+				v->vizinhos_sai->tamanho);
 
-		print_attr(v, v->vizinhos_esq);
+		print_attr(v, v->vizinhos_sai);
 	}
 }
 
@@ -158,9 +158,9 @@ void print_vattr(grafo g) {
         		v->nome,\
 				v->estado == NaoVisitado ? "NaoVisitado" : "Visitado",\
 				v->distancia,\
-				v->vizinhos_esq->tamanho);
+				v->vizinhos_sai->tamanho);
 
-		print_attr(v, v->vizinhos_esq);
+		print_attr(v, v->vizinhos_sai);
 	}
 }
 

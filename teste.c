@@ -1,5 +1,39 @@
 #include <stdio.h>
+#include <malloc.h>
 #include "grafo.h"
+
+typedef unsigned int uint;
+typedef long int lint;
+typedef struct no *no;
+
+typedef enum __Estado {
+	NaoVisitado = 0,
+	Visitado
+}Estado;
+
+typedef struct lista *lista;
+struct lista {
+
+  unsigned int tamanho;
+  int padding; // só pra evitar warning
+  no primeiro;
+};
+
+typedef struct grafo *grafo;
+struct grafo {
+	uint	nvertices;
+	uint	narestas;
+	int 	direcionado;
+	int 	ponderado;
+	lint	diametro;
+	char*	nome;
+	lista	vertices;
+};
+
+
+int destroi_vertice(void *v);
+void print_mat(lista **m, grafo g);
+
 
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
@@ -11,6 +45,58 @@ int main(int argc, char* argv[]) {
   if ( !g )
 
     return 1;
+
+
+  //https://www.youtube.com/watch?v=gdmfOwyQlcI
+  // binary heap
+  //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
+
+//	fprintf(stderr, "%d\n", direcionado(g));
+//	fprintf(stderr, "%ld\n", diametro(g));
+
+
+//    vertice u, v;
+//    u = busca_vertice("A", g->vertices);
+//    v = busca_vertice("F", g->vertices);
+//    lista T = caminho_minimo(u, v, g);
+//    print_vbylista(T);
+//    destroi_lista(T, NULL);
+
+	lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
+	lista **p = T2;
+	for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
+		*p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
+
+	caminhos_minimos(T2, g);
+	print_mat(T2, g);
+
+    uint i, j;
+	p = T2;
+	for( i=0; i < g->nvertices; i++  ) {
+		for( j=0; j< g->nvertices; j++ ) {
+			destroi_lista(T2[i][j], destroi_vertice);
+		}
+		free(*p++);
+	}
+	free(T2);
+
+//      vertice u = busca_vertice("A", g->vertices);
+//      vertice v = busca_vertice("G", g->vertices);
+//      fprintf(stderr, "%ld\n", distancia(u, v, g));
+
+
+//        lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
+//        for( i=0; i < g->nvertices; i++ ) {
+//                dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
+//        }
+//        distancias(dist, g);
+//        print_mat_dist(dist, g);
+//        for( i=0; i < g->nvertices; i++ ) {
+//                free(dist[i]);
+//        }
+//        free(dist);
+
+
 
   printf("nome: %s\n", nome_grafo(g));
   printf("%sdirecionado\n", direcionado(g) ? "" : "não ");
