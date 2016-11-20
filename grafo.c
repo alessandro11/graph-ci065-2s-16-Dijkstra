@@ -1068,3 +1068,24 @@ long int distancia(vertice u, vertice v, grafo g) {
 //      ou NULL caso não exista em g um vertice de nome s
 
 vertice vertice_nome(char *s, grafo g) { return busca_vertice(s, g->vertices); }
+
+//------------------------------------------------------------------------------
+// devolve o grau de v no grafo g, se não é direcionado ou se direcao == 0,
+//      ou o grau de entrada de v no grafo g, se direcao == -1,
+//      ou o grau de saída de v no grafo g, se direcao == +1
+
+unsigned int grau(vertice v, int direcao, grafo g) {
+	uint ret = 0;
+
+	switch( direcao ) {
+	case 0:
+		ret = v->vizinhos_esq->tamanho;
+		break;
+	case 1:
+		break;
+	case -1:
+		break;
+	}
+
+	return ret;
+}
