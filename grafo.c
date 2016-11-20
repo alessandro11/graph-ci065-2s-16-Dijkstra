@@ -278,6 +278,7 @@ void print_mat(lista**, grafo);
 void print_mat_dist(lint**, grafo);
 
 #else
+#define UNUSED(x)				(void)(x)
 
 #define print_a(vertice, lista)		(void)0
 #define print_v(grafo)				(void)0
@@ -675,56 +676,7 @@ grafo le_grafo(FILE *input) {
     g->narestas = (uint)agnedges(Ag_g);
     g->vertices = constroi_lista();
     constroi_grafo(Ag_g, g);
-
     agclose(Ag_g);
-
-    //https://www.youtube.com/watch?v=gdmfOwyQlcI
-    // binary heap
-    //http://www.cs.princeton.edu/~wayne/cs423/lectures/heaps-4up.pdf
-//    vertice u, v;
-//    u = busca_vertice("A", g->vertices);
-//    v = busca_vertice("F", g->vertices);
-//    lista T = caminho_minimo(u, v, g);
-//    print_vbylista(T);
-//    destroi_lista(T, NULL);
-
-//    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
-//	lista **p = T2;
-//	for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
-//		*p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
-
-//	caminhos_minimos(T2, g);
-//	print_mat(T2, g);
-
-    fprintf(stderr, "%d\n", direcionado(g));
-    return g;
-	uint i;
-//	p = T2;
-//	for( i=0; i < g->nvertices; i++  ) {
-//		for( j=0; j< g->nvertices; j++ ) {
-//			destroi_lista(T2[i][j], destroi_vertice);
-//		}
-//
-//		free(*p++);
-//	}
-//	free(T2);
-
-//	vertice u = busca_vertice("A", g->vertices);
-//	vertice v = busca_vertice("G", g->vertices);
-//	fprintf(stderr, "%ld\n", distancia(u, v, g));
-//	return g;
-//	fprintf(stderr, "%ld\n", diametro(g));
-
-	lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
-	for( i=0; i < g->nvertices; i++ ) {
-		dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
-	}
-	distancias(dist, g);
-	print_mat_dist(dist, g);
-	for( i=0; i < g->nvertices; i++ ) {
-		free(dist[i]);
-	}
-	free(dist);
 
     return g;
 }
