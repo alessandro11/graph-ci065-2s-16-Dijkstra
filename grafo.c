@@ -611,10 +611,7 @@ vertice alloc_vertice(const char* nome) {
 
 aresta alloc_aresta(void) {
 	aresta a = (aresta)calloc(1, sizeof(struct aresta));
-//	if( a ) {
-//		a->nome = str_dup(nome);
-//		a->peso = 0L;
-//	}
+	a->peso = 1;
 	return a;
 }
 
