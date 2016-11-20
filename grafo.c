@@ -278,7 +278,6 @@ void print_mat(lista**, grafo);
 void print_mat_dist(lint**, grafo);
 
 #else
-#define UNUSED(x)				(void)(x)
 
 #define print_a(vertice, lista)		(void)0
 #define print_v(grafo)				(void)0
@@ -685,17 +684,18 @@ grafo le_grafo(FILE *input) {
 //    print_vbylista(T);
 //    destroi_lista(T, NULL);
 
-//    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
-//      lista **p = T2;
-//      for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
-//              *p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
+    lista **T2 = (lista**)calloc(g->nvertices, sizeof(lista**));
+      lista **p = T2;
+      for( no n=primeiro_no(g->vertices); n; n=proximo_no(n) )
+              *p++ = (lista*)calloc(g->nvertices, sizeof(lista*));
 
-//      caminhos_minimos(T2, g);
-//      print_mat(T2, g);
+      caminhos_minimos(T2, g);
+      print_mat(T2, g);
+      return g;
 
 //    fprintf(stderr, "%d\n", direcionado(g));
 //    return g;
-    uint i;
+//    uint i;
 //      p = T2;
 //      for( i=0; i < g->nvertices; i++  ) {
 //              for( j=0; j< g->nvertices; j++ ) {
@@ -712,16 +712,16 @@ grafo le_grafo(FILE *input) {
 //      return g;
 //      fprintf(stderr, "%ld\n", diametro(g));
 
-        lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
-        for( i=0; i < g->nvertices; i++ ) {
-                dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
-        }
-        distancias(dist, g);
-        print_mat_dist(dist, g);
-        for( i=0; i < g->nvertices; i++ ) {
-                free(dist[i]);
-        }
-        free(dist);
+//        lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
+//        for( i=0; i < g->nvertices; i++ ) {
+//                dist[i] = (lint*)calloc(g->nvertices, sizeof(lint*));
+//        }
+//        distancias(dist, g);
+//        print_mat_dist(dist, g);
+//        for( i=0; i < g->nvertices; i++ ) {
+//                free(dist[i]);
+//        }
+//        free(dist);
 
     return g;
 }
@@ -759,7 +759,7 @@ vertices busca_vertices(const char* nome_orig, const char* nome_dest, lista l) {
 }
 
 void guarda_arcos(Agraph_t* ag, Agnode_t* av, grafo g) {
-	UNUSED(ag); UNUSED(av); UNUSED(g);
+
 }
 
 void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
