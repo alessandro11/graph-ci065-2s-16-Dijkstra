@@ -213,3 +213,16 @@ void print_mat(lista **m, grafo g) {
 		}
 	}
 }
+
+void print_mat_dist(lint **m, grafo g) {
+	unsigned int i, j;
+
+	for( i=0; i < g->nvertices; i++ ) {
+		for( j=0; j < g->nvertices; j++ ) {
+			fprintf(stderr, "(%u %u, %s %s)\n", i, j,\
+					busca_nome(i, g), busca_nome(j, g));
+
+			fprintf(stderr, " %ld\n", m[i][j]);
+		}
+	}
+}
