@@ -605,7 +605,7 @@ void 	dijkstra(vertice, grafo);
 
 grafo alloc_grafo(void) {
 	grafo g = (grafo)calloc(1, sizeof(struct grafo));
-	g->diametro = LONG_MAX;
+	g->diametro = -1;
 	return g;
 }
 
@@ -718,6 +718,12 @@ grafo le_grafo(FILE *input) {
 //		free(*p++);
 //	}
 //	free(T2);
+
+//	vertice u = busca_vertice("A", g->vertices);
+//	vertice v = busca_vertice("G", g->vertices);
+//	fprintf(stderr, "%ld\n", distancia(u, v, g));
+//	return g;
+//	fprintf(stderr, "%ld\n", diametro(g));
 
 	lint **dist = (lint**)calloc(g->nvertices, sizeof(lint**));
 	for( i=0; i < g->nvertices; i++ ) {
@@ -979,6 +985,7 @@ void dijkstra(vertice u, grafo g) {
 		ucorr->anterior = NULL;
 	}
 
+	g->diametro = -1;
 	u->estado = Visitado;
 	u->distancia = 0;
 //	print_vattr(g);
@@ -991,6 +998,7 @@ void dijkstra(vertice u, grafo g) {
 			a = conteudo(n);
 			if( a->destino->estado == NaoVisitado ) {
 				dist = a->origem->distancia + a->peso;
+				if( g->diametro < dist) g->diametro = dist;
 				if( dist < a->destino->distancia ) {
 					a->destino->distancia = dist;
 					a->destino->anterior = ucorr;
@@ -1014,7 +1022,7 @@ lista caminho_minimo(vertice u, vertice v, grafo g) {
 	dijkstra(u, g);
 
 	// Constroi lista com o menor caminho, percorrendo do objetivo
-	// a origem.
+	// v target.
 	T = constroi_lista();
 	insere_lista(v, T);
 	vertice p = v->anterior;
@@ -1087,4 +1095,30 @@ long int **distancias(long int **d, grafo g) {
 
 	return d;
 
+}
+
+//------------------------------------------------------------------------------
+// devolve o diâmetro de g
+
+long int diametro(grafo g) {
+	dijkstra((vertice)g->vertices->primeiro->conteudo, g);
+	return g->diametro;
+}
+
+//------------------------------------------------------------------------------
+// devolve um número entre 0 e numero_vertices(g)
+//
+// este número é único e distinto para cada vértice de g e deve servir
+// para indexar vetores e matrizes a partir dos vértices de g
+
+unsigned int indice(vertice v, grafo g) {
+	return v->id;
+}
+
+//------------------------------------------------------------------------------
+// devolve a distância de u a v em g
+
+long int distancia(vertice u, vertice v, grafo g) {
+	dijkstra(u, g);
+	return v->distancia;
 }
