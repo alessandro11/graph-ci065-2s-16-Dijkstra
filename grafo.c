@@ -342,41 +342,29 @@ int 	destroi_aresta(void*);
 
 //------------------------------------------------------------------------------
 // devolve o nome do grafo g
-char *nome_grafo(grafo g) {
-	return g->nome;
-}
+char *nome_grafo(grafo g) { return g->nome; }
 
 //------------------------------------------------------------------------------
 // devolve o nome do vertice v
-char *nome_vertice(vertice v) {
-	return v->nome;
-}
+char *nome_vertice(vertice v) { return v->nome; }
 
 //------------------------------------------------------------------------------
 // devolve 1, se g tem pesos nas arestas/arcos,
 //      ou 0, caso contrário
-int ponderado(grafo g) {
-	return g->ponderado;
-}
+int ponderado(grafo g) { return g->ponderado; }
 
 //------------------------------------------------------------------------------
 // devolve 1, se g tem pesos nas arestas/arcos,
 //      ou 0, caso contrário
-int direcionado(grafo g) {
-	return g->direcionado;
-}
+int direcionado(grafo g) { return g->direcionado; }
 
 //------------------------------------------------------------------------------
 // devolve o número de vértices do grafo g
-unsigned int numero_vertices(grafo g) {
-	return g->nvertices;
-}
+unsigned int numero_vertices(grafo g) { return g->nvertices; }
 
 //------------------------------------------------------------------------------
 // devolve o número de arestas/arcos do grafo g
-unsigned int numero_arestas(grafo g) {
-	return g->narestas;
-}
+unsigned int numero_arestas(grafo g) { return g->narestas; }
 
 //------------------------------------------------------------------------------
 // escreve o grafo g em output usando o formato dot.
@@ -708,6 +696,8 @@ grafo le_grafo(FILE *input) {
 //	caminhos_minimos(T2, g);
 //	print_mat(T2, g);
 
+    fprintf(stderr, "%d\n", direcionado(g));
+    return g;
 	uint i;
 //	p = T2;
 //	for( i=0; i < g->nvertices; i++  ) {
@@ -799,7 +789,7 @@ void guarda_arestas(Agraph_t* ag, Agnode_t* agn, grafo g, vertice v) {
 		peso = agget(age, str_peso);
 		if( peso ) {
 			a->peso = atol(peso);
-			a->ponderado = TRUE;
+			g->ponderado = a->ponderado = TRUE;
 		}
 
 		a->origem = vs.origem;
@@ -1111,9 +1101,7 @@ long int diametro(grafo g) {
 // este número é único e distinto para cada vértice de g e deve servir
 // para indexar vetores e matrizes a partir dos vértices de g
 
-unsigned int indice(vertice v, grafo g) {
-	return v->id;
-}
+unsigned int indice(vertice v, grafo g) { return v->id; }
 
 //------------------------------------------------------------------------------
 // devolve a distância de u a v em g
@@ -1122,3 +1110,9 @@ long int distancia(vertice u, vertice v, grafo g) {
 	dijkstra(u, g);
 	return v->distancia;
 }
+
+//------------------------------------------------------------------------------
+// devolve o vertice de nome s no grafo g,
+//      ou NULL caso não exista em g um vertice de nome s
+
+vertice vertice_nome(char *s, grafo g) { return busca_vertice(s, g->vertices); }
