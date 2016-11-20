@@ -8,4 +8,5 @@ strict digraph "d" {
 	a -> b ["peso"=5, label=5]
 	b -> c ["peso"=7, label=7]
 	b -> d ["peso"=2, label=2]
+	d -> a ["peso"=9, label=9]
 }
