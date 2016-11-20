@@ -49,7 +49,7 @@ struct vertice {
 	Estado	estado;
 	vertice anterior;
 	lista	vizinhos_sai;
-	lista	vizinhos_dir;
+	lista	vizinhos_ent;
 };
 
 typedef struct aresta* aresta;
@@ -74,19 +74,56 @@ void print_v(grafo g);
 void print_attr(vertice v, lista l);
 
 /*____________________________________________________________________________*/
+
+void print_digraph_a(lista l) {
+    no n;
+    struct aresta* a;
+
+    n=primeiro_no(l);
+    if( n ) {
+        a = conteudo(n);
+        fprintf(stderr, "\t(%s, %s) peso=%ld\n",\
+        		a->origem->nome, a->destino->nome, a->peso);
+        for( n=proximo_no(n); n; n=proximo_no(n) ) {
+            a = conteudo(n);
+            fprintf(stderr, "\t(%s, %s) peso=%ld\n",\
+            		a->origem->nome, a->destino->nome, a->peso);
+        }
+    }
+}
+
+void print_digraph_v(grafo g) {
+	no n;
+	struct vertice* v;
+	lista l = g->vertices;
+
+	fprintf(stderr, "Grafo %s=%p\n", g->nome, g);
+	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
+		v = conteudo(n);
+		fprintf(stderr, "%u %s=%p\n", v->id, v->nome, v);
+		fprintf(stderr, "\tvizinhos_sai...\n");
+		print_digraph_a(v->vizinhos_sai);
+		fprintf(stderr, "\tvizinhos_ent...\n");
+		print_digraph_a(v->vizinhos_ent);
+	}
+}
+
 void print_v(grafo g) {
 	no n;
 	struct vertice* v;
 	lista l = g->vertices;
 
-	printf("Grafo %s=%p\n", g->nome, g);
+	if( g->direcionado ) {
+		print_digraph_v(g);
+		return;
+	}
+
+	fprintf(stderr, "Grafo %s=%p\n", g->nome, g);
 	for( n=primeiro_no(l); n; n=proximo_no(n) ) {
 			v = conteudo(n);
-			printf("%u %s=%p\n", v->id, v->nome, v);
-			printf("\tV.:\n");
+			fprintf(stderr, "%u %s=%p\n", v->id, v->nome, v);
 			print_a(v, v->vizinhos_sai);
 	}
-	fflush(stdout);
 }
 
 void print_vbylista(lista l) {
@@ -113,12 +150,12 @@ void print_a(vertice v, lista l) {
     n=primeiro_no(l);
     if( n ) {
         a = conteudo(n);
-        fprintf(stderr, "\taresta=%p\n", a);
-        fprintf(stderr, "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
+//        fprintf(stderr, "\taresta=%p\n", a);
+        fprintf(stderr, "\t(%s, %s)\n", v->nome, a->destino->nome);
         for( n=proximo_no(n); n; n=proximo_no(n) ) {
             a = conteudo(n);
-            fprintf(stderr, "\taresta=%p\n", a);
-            fprintf(stderr, "\t(%s=%p, %s=%p)\n", v->nome, v, a->destino->nome, a->destino);
+//            fprintf(stderr, "\taresta=%p\n", a);
+            fprintf(stderr, "\t(%s, %s)\n", v->nome, a->destino->nome);
         }
     }
 }
