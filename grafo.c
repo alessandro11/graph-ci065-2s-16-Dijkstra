@@ -1117,15 +1117,12 @@ vertice vertice_nome(char *s, grafo g) { return busca_vertice(s, g->vertices); }
 unsigned int grau(vertice v, int direcao, grafo g) {
 	uint ret = 0;
 
-	switch( direcao ) {
-	case 0:
+	if( g->direcionado == FALSE || direcao == 0 )
 		ret = v->vizinhos_sai->tamanho;
-		break;
-	case 1:
-		break;
-	case -1:
-		break;
-	}
+	else if( direcao == -1 )
+		ret = v->vizinhos_ent->tamanho;
+	else
+		ret = v->vizinhos_sai->tamanho;
 
 	return ret;
 }
