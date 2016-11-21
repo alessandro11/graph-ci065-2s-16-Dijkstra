@@ -326,7 +326,7 @@ struct vertice {
 	Estado	estado;
 	vertice anterior;
 	lista	vizinhos_sai;
-	lista	vizinhos_dir;
+	lista	vizinhos_ent;
 };
 
 typedef struct aresta* aresta;
@@ -425,6 +425,8 @@ int destroi_vertice(void *v) {
 
 	free( ((vertice)v)->nome );
 	ret = destroi_lista( ((vertice)v)->vizinhos_sai, destroi_aresta );
+	if( ((vertice)v)->vizinhos_ent )
+		destroi_lista(((vertice)v)->vizinhos_ent, destroi_aresta);
 	free(v);
 
 	return ret;
@@ -584,7 +586,7 @@ void 	guarda_arcos(Agraph_t*, Agnode_t*, grafo);
 void 	guarda_arestas(Agraph_t*, Agnode_t*, grafo, vertice);
 void 	constroi_grafo(Agraph_t*, grafo);
 grafo	alloc_grafo(void);
-vertice alloc_vertice(const char*);
+vertice alloc_vertice(const char*, bool);
 aresta 	alloc_aresta(void);
 aresta 	dup_aresta(aresta);
 char* 	str_dup(const char*);
@@ -597,12 +599,14 @@ grafo alloc_grafo(void) {
 	return g;
 }
 
-vertice alloc_vertice(const char* nome) {
+vertice alloc_vertice(const char* nome, bool direcionado) {
 	vertice v = (vertice)calloc(1, sizeof(struct vertice));
 	if( v ) {
 		v->nome = str_dup(nome);
 		v->vizinhos_sai = constroi_lista();
-//		v->vizinhos_dir = constroi_lista();
+		if( direcionado )
+			v->vizinhos_ent = constroi_lista();
+		v->distancia = LONG_MAX;
 	}
 
 	return v;
@@ -624,7 +628,7 @@ aresta dup_aresta(aresta a) {
 }
 
 vertice dup_vertice(vertice u) {
-	vertice v = alloc_vertice(u->nome);
+	vertice v = alloc_vertice(u->nome, FALSE);
 	v->id = u->id;
 	v->distancia = u->distancia;
 
@@ -710,14 +714,45 @@ vertices busca_vertices(const char* nome_orig, const char* nome_dest, lista l) {
 }
 
 void guarda_arcos(Agraph_t* ag, Agnode_t* av, grafo g) {
-	Agedge_t *aga;
+	Agedge_t 	*age;
+	void    	*tail, *head;
+    char     	str_peso[5] = "peso";
+    char*		peso;
+	vertices	vs;
+	aresta   	a;
+	vertice		v = busca_vertice(agnameof(av), g->vertices);
 
-	for( aga=agfstout(ag, av); aga; aga=agnxtout(ag, aga) ) {
-		fprintf(stderr, "%s->%s\n", agnameof(agtail(aga)), agnameof(aghead(aga)));
+	// Vizinhos de saida
+	for( age=agfstout(ag, av); age; age=agnxtout(ag, age) ) {
+		tail = agtail(age);
+		head = aghead(age);
+		vs = busca_vertices(agnameof(tail), agnameof(head), g->vertices);
+		a = alloc_aresta();
+		peso = agget(age, str_peso);
+		if( peso ) {
+			a->peso = atol(peso);
+			g->ponderado = a->ponderado = TRUE;
+		}
+		a->origem = vs.origem;
+		a->destino = vs.destino;
+		insere_lista(a, v->vizinhos_sai);
 	}
 
-	for( aga=agfstin(ag, av); aga; aga=agnxtin(ag, aga) ) {
-		fprintf(stderr, "%s->%s\n", agnameof(agtail(aga)), agnameof(aghead(aga)));
+	// Vizinhos de chegada
+	for( age=agfstin(ag, av); age; age=agnxtin(ag, age) ) {
+		tail = agtail(age);
+		head = aghead(age);
+		vs = busca_vertices(agnameof(tail), agnameof(head), g->vertices);
+		a = alloc_aresta();
+		peso = agget(age, str_peso);
+		if( peso ) {
+			a->peso = atol(peso);
+			g->ponderado = a->ponderado = TRUE;
+		}
+		a->origem = vs.origem;
+		a->destino = vs.destino;
+		insere_lista(a, v->vizinhos_ent);
+
 	}
 }
 
@@ -762,7 +797,7 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 	// Armazene a lista de vértices; deste modo podemos
 	// apenas apontar as arestas para os respectivos vértices.
 	for( agn=agfstnode(ag); agn; agn=agnxtnode(ag, agn) ) {
-		v = alloc_vertice(agnameof(agn));
+		v = alloc_vertice(agnameof(agn), g->direcionado);
 		v->id = id++;
 		insere_lista(v, g->vertices);
 	}
@@ -773,9 +808,10 @@ void constroi_grafo(Agraph_t* ag, grafo g) {
 		else
 			guarda_arestas( ag, agn, g, busca_vertice(agnameof(agn), g->vertices) );
 
-		// funciona somente em modo de DEBUG, link com debug.c
-		print_v(g);
 	}
+
+	// funciona somente em modo de DEBUG, link com debug.c
+	print_v(g);
 }
 
 no vertice_min_dist(lista l) {
@@ -1081,15 +1117,12 @@ vertice vertice_nome(char *s, grafo g) { return busca_vertice(s, g->vertices); }
 unsigned int grau(vertice v, int direcao, grafo g) {
 	uint ret = 0;
 
-	switch( direcao ) {
-	case 0:
+	if( g->direcionado == FALSE || direcao == 0 )
 		ret = v->vizinhos_sai->tamanho;
-		break;
-	case 1:
-		break;
-	case -1:
-		break;
-	}
+	else if( direcao == -1 )
+		ret = v->vizinhos_ent->tamanho;
+	else
+		ret = v->vizinhos_sai->tamanho;
 
 	return ret;
 }
