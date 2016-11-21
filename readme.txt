@@ -8,3 +8,9 @@ caminho mínimo. Os únicos membros válidos de cada vértice duplicado são:
 		 matriz.
 	distancia - distância da raiz u até o vértice v.
 pois não repliquei a vizinhança de cada vértice.
+
+c[indice(u,g)] = [indice(v,g)] na diagonal da matriz somete há uma instância
+de uma lista com 0 elementos nela.
+
+long int **distancias(long int **d, grafo g)
+	É esperado que d esteja alocado, se não seg. fault.
